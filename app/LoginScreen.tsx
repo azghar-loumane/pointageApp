@@ -1,20 +1,37 @@
-    import { useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View ,SafeAreaView , Image } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View ,SafeAreaView , Image , Alert} from 'react-native';
 import {  saveToken } from '../utils/token';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
     export default function LoginScreen() {
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    //will updated after connect to the back end  : !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const handleLogin = async () => {
-        if (email && password) {
-        await saveToken('demo-token');
-        router.replace('/Planning');
+    try {
+        const response = await fetch('https://backend-url.com/api/login', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+        
+        
+        if (response.ok) {
+            saveToken(data.token);
+            await AsyncStorage.setItem('userData', JSON.stringify(data.userData));
+            router.replace('/(Screens)/Planning')
         } else {
-        alert('Enter email and password');
+            Alert.alert('Login Failed', data.message || 'Invalid credentials');
+        }
+        } catch (error) {
+            Alert.alert('Error!:' , `${error} , Something went wrong. Please try again.`);
+            router.replace('/(Screens)/Planning')
         }
     };
 

@@ -2,6 +2,7 @@
     import { View, Text, StyleSheet, Button, Alert, TouchableOpacity } from 'react-native';
     import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
     import { useSafeAreaInsets } from 'react-native-safe-area-context';
+    import AsyncStorage from '@react-native-async-storage/async-storage';
 
     export default function AddTrack() {
     const {top , bottom } = useSafeAreaInsets();
@@ -22,12 +23,40 @@
         );
     }
 
-    const handleBarCodeScanned = (result: BarcodeScanningResult) => {
-        setScanned(true);
-        //I will Change It When I Connect To The BackEnd:
-        console.log(result);
-        Alert.alert('QR Code Scanned', `Type: ${result.type}\nData: ${result.data}`);
+    const handleBarCodeScanned = async (result: BarcodeScanningResult) => {
+        // try{
+        //     setScanned(true);
+        //     const storedUser = await AsyncStorage.getItem('userData');
+        //     if (!storedUser) {
+        //         Alert.alert('Error', 'User not found. Please log in again.');
+        //         return;
+        //     }
+        //     const user = JSON.parse(storedUser);
+        //     const response = await fetch('https://your-api.com/api/track', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //         userId: user.id,
+        //         qrData: result.data,
+        //         qrType: result.type,
+        //     }),
+        //     });
 
+        //     const resJson = await response.json();
+
+        //     if (response.ok) {
+        //     Alert.alert('Success', 'QR code data sent successfully.');
+        //     console.log('Backend response:', resJson);
+        //     } else {
+        //     Alert.alert('Failed', resJson.message || 'Something went wrong');
+        //     }
+        // } catch (error) {
+        //     console.error(error);
+        //     Alert.alert('Error',`${error} Could not process the QR code.`);
+        // }
+        Alert.alert(result.data);
     };
 
     return (

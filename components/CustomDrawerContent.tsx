@@ -3,6 +3,8 @@ import { DrawerContentScrollView, DrawerItem, DrawerItemList } from "@react-navi
 import { useRouter } from "expo-router";
 import { Image , View ,Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from '@expo/vector-icons';
+
 
     export default function CustomDrawerContent(props: any){
         const router = useRouter();
@@ -36,7 +38,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
             </View>
             <View style={{backgroundColor: '#fff', padding:10}}>
                 <DrawerItemList {...props} />
-                <DrawerItem label={'logout'} onPress={hundelLogout} />
+                <DrawerItem 
+                label={'logout'} 
+                onPress={hundelLogout} 
+                labelStyle={{ color: '#e91e63' }}
+                icon={({ color , size }) => (
+                <Ionicons name="log-out-outline" color={color} size={size} style={{color: '#e91e63'}}/>
+                )}/>
             </View>
         </DrawerContentScrollView>
 

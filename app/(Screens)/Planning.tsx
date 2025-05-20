@@ -1,27 +1,91 @@
-    import React from 'react';
-    import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+    import React, { useState, useEffect } from 'react';
+    import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
+    import AsyncStorage from '@react-native-async-storage/async-storage';
 
-    const days = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-    ];
+    type WorkDay = {
+    day: string;
+    from: string | null;
+    to: string | null;
+    isWorkDay: boolean;
+    };
 
-    const periods = [
-    '08:00 - 12:00',
-    '13:00 - 17:00'
-    ];
+    type Plan = {
+    name: string;
+    days: WorkDay[];
+    };
 
     export default function PlanningScreen() {
+    const [plan, setPlan] = useState<Plan | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPlan = async () => {
+        try {
+                const storedUser = await AsyncStorage.getItem('userData');
+            if (!storedUser) {
+                Alert.alert('Error', 'User not found. Please log in again.');
+                return(
+                    <View>
+                        <Text>
+                            Error....User not found. Please log in again.
+                        </Text>
+                    </View>
+                );
+            }
+        const user = JSON.parse(storedUser);
+        const userId = user.id;
+
+            const response = await fetch(`https://your-api.com/api/planning/${userId}`);
+            const json = await response.json();
+
+            const parsedPlan = JSON.parse(json.planJson);
+            setPlan(parsedPlan);
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Error', 'Could not load planning data');
+        } finally {
+            setLoading(false);
+        }
+        };
+
+        fetchPlan();
+    }, []);
+
+    if (loading) {
+        return (
+        <SafeAreaView style={styles.safeArea}>
+            <Text style={{ textAlign: 'center', marginTop: 40 }}>Loading...</Text>
+        </SafeAreaView>
+        );
+    }
+
+    if (!plan) {
+        return (
+        <SafeAreaView style={styles.safeArea}>
+            <Text style={{ textAlign: 'center', marginTop: 40 }}>No plan found</Text>
+        </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
-            {days.map((day, index) => (
-            <View key={index} style={styles.dayRow}>
-                <Text style={styles.dayText}>{day}</Text>
+            {plan.days.map((day: WorkDay, index: number) => (
+            <View
+                key={index}
+                style={[
+                styles.dayRow,
+                { borderLeftColor: day.isWorkDay ? 'green' : 'red', borderLeftWidth: 5 },
+                ]}
+            >
+                <Text style={styles.dayText}>{day.day}</Text>
+                {day.isWorkDay ? (
                 <View style={styles.timeColumn}>
-                {periods.map((time, idx) => (
-                    <Text key={idx} style={styles.timeText}>{time}</Text>
-                ))}
+                    <Text style={styles.timeText}>{`${day.from} - ${day.to}`}</Text>
                 </View>
+                ) : (
+                <Text style={styles.offText}>Not working</Text>
+                )}
             </View>
             ))}
             <View style={{ height: 40 }} />
@@ -53,14 +117,28 @@
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
-        
     },
     timeColumn: {
         alignItems: 'flex-end',
+        borderWidth: 1,
+        borderColor: 'green',
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        borderRadius: 8,
+        backgroundColor: '#eaffea',
     },
     timeText: {
-        fontSize: 22,
-        color: '#000',
-        marginBottom: 4,
+        fontSize: 18,
+        color: 'green',
+    },
+    offText: {
+        fontSize: 16,
+        color: 'red',
+        borderWidth: 1,
+        borderColor: 'red',
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        borderRadius: 8,
+        backgroundColor: '#ffeaea',
     },
     });

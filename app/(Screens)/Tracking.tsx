@@ -1,46 +1,111 @@
-    import React from 'react';
-    import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+    import React, { useEffect, useState } from 'react';
+    import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
     import { Ionicons } from '@expo/vector-icons';
 
-    const days = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-    ];
+    type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
 
-    const periods = ['08:00 - 12:00', '13:00 - 17:00'];
+    type WorkDayStatus = 'PRESENT' | 'ABSENT' | 'OFF';
 
-    //this is a static i will change it when i connect to back end:
-    const attendance = {
-    Monday: [true, false],
-    Tuesday: [true, true],
-    Wednesday: [false, false],
-    Thursday: [true, false],
-    Friday: [false, true],
-    Saturday: [true, true],
-    Sunday: [false, false]
+    type AttendanceEntry = {
+    id: number;
+    employeeId: number;
+    employeeName: string;
+    timestamp: string;
+    status: WorkDayStatus;
+    notifiedManager: boolean;
+    reportedChef: boolean;
+    };
+
+    type DailyAttendance = {
+    [day in DayOfWeek]: WorkDayStatus;
+    };
+
+    const days: DayOfWeek[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    const workSchedule: Record<DayOfWeek, boolean> = {
+    Monday: true,
+    Tuesday: true,
+    Wednesday: true,
+    Thursday: false,
+    Friday: true,
+    Saturday: false,
+    Sunday: false,
     };
 
     export default function TrackingScreen() {
+    const [attendance, setAttendance] = useState<DailyAttendance>({
+        Monday: 'OFF',
+        Tuesday: 'OFF',
+        Wednesday: 'OFF',
+        Thursday: 'OFF',
+        Friday: 'OFF',
+        Saturday: 'OFF',
+        Sunday: 'OFF',
+    });
+
+    useEffect(() => {
+        const userId = 1;
+
+        async function fetchAttendance() {
+        try {
+            const response = await fetch(`https://your-api.com/api/attendance/${userId}`);
+            const data: AttendanceEntry[] = await response.json();
+
+            const parsed: DailyAttendance = {
+            Monday: workSchedule.Monday ? 'ABSENT' : 'OFF',
+            Tuesday: workSchedule.Tuesday ? 'ABSENT' : 'OFF',
+            Wednesday: workSchedule.Wednesday ? 'ABSENT' : 'OFF',
+            Thursday: workSchedule.Thursday ? 'ABSENT' : 'OFF',
+            Friday: workSchedule.Friday ? 'ABSENT' : 'OFF',
+            Saturday: workSchedule.Saturday ? 'ABSENT' : 'OFF',
+            Sunday: workSchedule.Sunday ? 'ABSENT' : 'OFF',
+            };
+
+            data.forEach(entry => {
+            const date = new Date(entry.timestamp);
+            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' }) as DayOfWeek;
+            parsed[weekday] = entry.status;
+            });
+
+            setAttendance(parsed);
+        } catch (error) {
+            console.error('Error fetching attendance:', error);
+            Alert.alert('Error', 'Could not load attendance data');
+        }
+        }
+
+        // fetchAttendance(); 
+    }, []);
+
     return (
         <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.container}>
-            {days.map((day, index) => (
-            <View key={index} style={styles.dayRow}>
+            {days.map((day, index) => {
+            const status = attendance[day];
+
+            const icon =
+                status === 'PRESENT'
+                ? 'checkmark-circle'
+                : status === 'ABSENT'
+                ? 'close-circle'
+                : 'remove-circle-outline';
+
+            const color =
+                status === 'PRESENT' ? 'green' : status === 'ABSENT' ? 'red' : 'gray';
+
+            const label =
+                status === 'PRESENT' ? 'Present' : status === 'ABSENT' ? 'Absent' : 'Off';
+
+            return (
+                <View key={index} style={styles.dayRow}>
                 <Text style={styles.dayText}>{day}</Text>
-                <View style={styles.timeColumn}>
-                {periods.map((time, idx) => (
-                    <View key={idx} style={styles.periodRow}>
-                    <Text style={styles.timeText}>{time}</Text>
-                    <Ionicons
-                        name={attendance[day]?.[idx] ? 'checkmark-circle' : 'close-circle'}
-                        size={20}
-                        color={attendance[day]?.[idx] ? 'green' : 'red'}
-                        style={{ marginLeft: 8 }}
-                    />
-                    </View>
-                ))}
+                <View style={styles.statusContainer}>
+                    <Ionicons name={icon} size={24} color={color} />
+                    <Text style={[styles.statusText, { color }]}>{label}</Text>
                 </View>
-            </View>
-            ))}
+                </View>
+            );
+            })}
             <View style={{ height: 40 }} />
         </ScrollView>
         </SafeAreaView>
@@ -59,7 +124,7 @@
     dayRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems:'center',
+        alignItems: 'center',
         backgroundColor: '#ffffff',
         padding: 16,
         marginBottom: 12,
@@ -71,16 +136,13 @@
         fontWeight: 'bold',
         color: '#333',
     },
-    timeColumn: {
-        alignItems: 'flex-end',
-    },
-    periodRow: {
+    statusContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 4,
     },
-    timeText: {
-        fontSize: 22,
-        color: '#000',
+    statusText: {
+        marginLeft: 8,
+        fontSize: 16,
+        fontWeight: '600',
     },
     });

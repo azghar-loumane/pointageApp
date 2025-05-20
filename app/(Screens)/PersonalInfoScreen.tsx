@@ -1,4 +1,5 @@
-    import React, { useState } from 'react';
+    import React from 'react';
+    import AsyncStorage from '@react-native-async-storage/async-storage';
     import {
     View,
     Text,
@@ -8,16 +9,22 @@
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
+    Alert,
     } from 'react-native';
 
-    const ProfileScreen: React.FC = () => {
-    const [userData, setUserData] = useState({
-            profileImage: '@/assets/images/default-Photo.jpg',
-            userName: 'loukmane',
-            email: 'loukmane@gmail.com',
-            pin: '00000',
-            service: 'IT',
-    });
+    const ProfileScreen: React.FC = async() => {
+    const storedUser = await AsyncStorage.getItem('userData');
+        if (!storedUser) {
+            Alert.alert('Error', 'User not found. Please log in again.');
+            return(
+                <View>
+                    <Text>
+                        Error....User not found. Please log in again.
+                    </Text>
+                </View>
+            );
+        }
+    const user = JSON.parse(storedUser);
 
 
     return (
@@ -36,7 +43,7 @@
                         <Text style={styles.label}>User Name</Text>
                         <TextInput
                             style={styles.input}
-                            value={userData.userName}
+                            value={user.userName}
                             editable={false}
                         />
 
@@ -44,7 +51,7 @@
                         <TextInput
                             style={styles.input}
                             keyboardType="email-address"
-                            value={userData.email}
+                            value={user.email}
                             editable={false}
                         />
 
@@ -52,14 +59,14 @@
                         <TextInput
                             style={styles.input}
                             keyboardType="numeric"
-                            value={userData.pin}
+                            value={user.pin}
                             editable={false}
                         />
 
                         <Text style={styles.label}>Service</Text>
                         <TextInput
                             style={styles.input}
-                            value={userData.service}
+                            value={user.service}
                             editable={false}
                         />
                     </View>
