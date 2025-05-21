@@ -15,6 +15,18 @@
     };
 
     export default function PlanningScreen() {
+//     const defaultPlan: Plan = {
+//     name: 'Default Plan',
+//     days: [
+//         { day: 'Monday', from: '09:00', to: '17:00', isWorkDay: true },
+//         { day: 'Tuesday', from: '09:00', to: '17:00', isWorkDay: true },
+//         { day: 'Wednesday', from: '09:00', to: '17:00', isWorkDay: true },
+//         { day: 'Thursday', from: '09:00', to: '17:00', isWorkDay: true },
+//         { day: 'Friday', from: '09:00', to: '17:00', isWorkDay: true },
+//         { day: 'Saturday', from: null, to: null, isWorkDay: false },
+//         { day: 'Sunday', from: null, to: null, isWorkDay: false },
+//     ],
+// };
     const [plan, setPlan] = useState<Plan | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -97,7 +109,7 @@
     const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#ecfdf5',
     },
     container: {
         padding: 16,

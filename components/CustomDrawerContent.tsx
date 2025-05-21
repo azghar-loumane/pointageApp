@@ -21,7 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
     <View style={{flex: 1}}>
         <DrawerContentScrollView {...props} 
         scrollEnabled={false}
-        contentContainerStyle={{backgroundColor: '#dde3fe',  paddingEnd: 0 , paddingStart:0 , paddingBottom: 0}}
+        contentContainerStyle={{backgroundColor: '#ecfdf5',  paddingEnd: 0 , paddingStart:0 , paddingBottom: 0}}
         >
             <View style={{padding: 20,}}>
                 <Image
@@ -33,7 +33,7 @@ import { Ionicons } from '@expo/vector-icons';
                     fontWeight:'500',
                     fontSize: 18,
                     paddingTop:10,
-                    color: '#5363df'
+                    color: '#105844'
                 }}>Azghar loukmane</Text>
             </View>
             <View style={{backgroundColor: '#fff', padding:10}}>
@@ -50,7 +50,7 @@ import { Ionicons } from '@expo/vector-icons';
 
         <View
         style={{
-            borderTopColor:'#dde3fe',
+            borderTopColor:'#ecfdf5',
             borderTopWidth:1,
             padding:20,
             paddingBottom:20 + bottom ,

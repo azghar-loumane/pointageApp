@@ -1,12 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View ,SafeAreaView , Image , Alert} from 'react-native';
-import {  saveToken } from '../utils/token';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { saveToken } from '../utils/token';
 
     export default function LoginScreen() {
     const router = useRouter();
-    const [email, setEmail] = useState('');
+    const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
             headers: {
             'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ userName, password }),
         });
 
         const data = await response.json();
@@ -31,12 +31,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         }
         } catch (error) {
             Alert.alert('Error!:' , `${error} , Something went wrong. Please try again.`);
-            router.replace('/(Screens)/Planning')
         }
     };
 
     return (
-        <SafeAreaView style={{flex:1 , backgroundColor: '#5363df'}}>
+        <SafeAreaView style={{flex:1 , backgroundColor: '#ecfdf5'}}>
                     <View style={styles.container}>
                         <View style={styles.header}>
                             <Image 
@@ -56,10 +55,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         
                                 <TextInput
                                 style={styles.inputControl}
-                                placeholder="Enter Your Email Address"
+                                placeholder="Enter Your userName Address"
                                 placeholderTextColor='#6b7280'
-                                value={email}
-                                onChangeText={email => setEmail(email)}
+                                value={userName}
+                                onChangeText={userName => setUserName(userName)}
                                 />
                             </View>
         
@@ -68,12 +67,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                                 <TextInput
                                 autoCapitalize="none"
                                 autoCorrect={false}
-                                keyboardType="email-address"
                                 secureTextEntry
                                 style={styles.inputControl}
                                 placeholder="Password"
                                 placeholderTextColor='#6b7280'
                                 value={password}
+                                
                                 onChangeText={password => setPassword(password)}
                                 />
                             </View>
@@ -155,10 +154,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         letterSpacing:0.15,
     },
     btn: {
-        backgroundColor:'#075eec',
+        backgroundColor:'#105844',
         borderRadius:8,
         borderWidth:1,
-        borderColor:'#075eec',
+        borderColor:'#105844',
         flexDirection:'row',
         alignItems:'center',
         justifyContent: 'center',

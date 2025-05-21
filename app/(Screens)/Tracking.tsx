@@ -1,9 +1,10 @@
     import React, { useEffect, useState } from 'react';
-    import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
+    import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
     import { Ionicons } from '@expo/vector-icons';
+    import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
     type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
-
     type WorkDayStatus = 'PRESENT' | 'ABSENT' | 'OFF';
 
     type AttendanceEntry = {
@@ -22,16 +23,6 @@
 
     const days: DayOfWeek[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    const workSchedule: Record<DayOfWeek, boolean> = {
-    Monday: true,
-    Tuesday: true,
-    Wednesday: true,
-    Thursday: false,
-    Friday: true,
-    Saturday: false,
-    Sunday: false,
-    };
-
     export default function TrackingScreen() {
     const [attendance, setAttendance] = useState<DailyAttendance>({
         Monday: 'OFF',
@@ -43,39 +34,67 @@
         Sunday: 'OFF',
     });
 
-    useEffect(() => {
-        const userId = 1;
+    const [loading, setLoading] = useState(true);
 
-        async function fetchAttendance() {
+    useEffect(() => {
+        const fetchAttendance = async () => {
         try {
+
+            const storedUser = await AsyncStorage.getItem('userData');
+            if (!storedUser) {
+                Alert.alert('Error', 'User not found. Please log in again.');
+                return(
+                    <View>
+                        <Text>
+                            Error....User not found. Please log in again.
+                        </Text>
+                    </View>
+                );
+            }
+            const user = JSON.parse(storedUser);
+            const userId = user.id;
+
+
             const response = await fetch(`https://your-api.com/api/attendance/${userId}`);
             const data: AttendanceEntry[] = await response.json();
 
+            // Start with default OFF/ABSENT values
             const parsed: DailyAttendance = {
-            Monday: workSchedule.Monday ? 'ABSENT' : 'OFF',
-            Tuesday: workSchedule.Tuesday ? 'ABSENT' : 'OFF',
-            Wednesday: workSchedule.Wednesday ? 'ABSENT' : 'OFF',
-            Thursday: workSchedule.Thursday ? 'ABSENT' : 'OFF',
-            Friday: workSchedule.Friday ? 'ABSENT' : 'OFF',
-            Saturday: workSchedule.Saturday ? 'ABSENT' : 'OFF',
-            Sunday: workSchedule.Sunday ? 'ABSENT' : 'OFF',
+            Monday: 'OFF',
+            Tuesday: 'OFF',
+            Wednesday: 'OFF',
+            Thursday: 'OFF',
+            Friday:  'OFF',
+            Saturday: 'OFF',
+            Sunday: 'OFF',
             };
 
-            data.forEach(entry => {
+            // Fill in actual PRESENT statuses
+            data.forEach((entry) => {
             const date = new Date(entry.timestamp);
-            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' }) as DayOfWeek;
-            parsed[weekday] = entry.status;
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }) as DayOfWeek;
+            parsed[dayName] = entry.status;
             });
 
             setAttendance(parsed);
         } catch (error) {
             console.error('Error fetching attendance:', error);
             Alert.alert('Error', 'Could not load attendance data');
+        } finally {
+            setLoading(false);
         }
-        }
+        };
 
-        // fetchAttendance(); 
+        fetchAttendance();
     }, []);
+
+    if (loading) {
+        return (
+        <SafeAreaView style={styles.safeArea}>
+            <ActivityIndicator size="large" color="#075eec" style={{ marginTop: 40 }} />
+        </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>

@@ -24,41 +24,58 @@
     }
 
     const handleBarCodeScanned = async (result: BarcodeScanningResult) => {
-        // try{
-        //     setScanned(true);
-        //     const storedUser = await AsyncStorage.getItem('userData');
-        //     if (!storedUser) {
-        //         Alert.alert('Error', 'User not found. Please log in again.');
-        //         return;
-        //     }
-        //     const user = JSON.parse(storedUser);
-        //     const response = await fetch('https://your-api.com/api/track', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         userId: user.id,
-        //         qrData: result.data,
-        //         qrType: result.type,
-        //     }),
-        //     });
+    try {
+        setScanned(true);
 
-        //     const resJson = await response.json();
+        const storedUser = await AsyncStorage.getItem('userData');
+        if (!storedUser) {
+            Alert.alert('Error', 'User not found. Please log in again.');
+            return;
+        }
 
-        //     if (response.ok) {
-        //     Alert.alert('Success', 'QR code data sent successfully.');
-        //     console.log('Backend response:', resJson);
-        //     } else {
-        //     Alert.alert('Failed', resJson.message || 'Something went wrong');
-        //     }
-        // } catch (error) {
-        //     console.error(error);
-        //     Alert.alert('Error',`${error} Could not process the QR code.`);
-        // }
-        Alert.alert(result.data);
-    };
+        const user = JSON.parse(storedUser);
 
+        const expectedRes = await fetch(`https://your-api.com/api/expected-qr`);
+        const expectedData = await expectedRes.json();
+
+        if (!expectedRes.ok || !expectedData.qrCode) {
+            Alert.alert('Error', expectedData.message || 'Could not fetch expected QR code.');
+            return;
+        }
+
+        if (expectedData.qrCode !== result.data) {
+            Alert.alert('Data Failed', 'Scan the QR code again.');
+            return;
+        }
+
+        const payload = {
+            id: user.id,
+            timestamp: new Date().toISOString(),
+            status: 'PRESENT',
+        };
+
+        const response = await fetch('https://your-api.com/api/track', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const resJson = await response.json();
+
+        if (response.ok) {
+            Alert.alert('Success', 'Attendance recorded successfully.');
+            console.log('Backend response:', resJson);
+        } else {
+            Alert.alert('Failed', resJson.message || 'Something went wrong.');
+        }
+
+    } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'An error occurred while processing the QR code.');
+    }
+};
     return (
         <View style={styles.container}>
         <CameraView

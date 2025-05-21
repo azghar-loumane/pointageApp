@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
             drawerContent={CustomDrawerContent}
             screenOptions={{
                 drawerHideStatusBarOnOpen: true,
-                drawerActiveBackgroundColor: '#5363df',
+                drawerActiveBackgroundColor: '#105844',
                 drawerActiveTintColor: '#fff',
             }}>
                 <Drawer.Screen
