@@ -8,6 +8,8 @@ import { saveToken } from '../utils/token';
     const router = useRouter();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [userNameIsFocused, setUserNameIsFocused] = useState(false);
+    const [emailIsFocused, setEmailIsFocused] = useState(false);
 
     const handleLogin = async () => {
     try {
@@ -51,18 +53,20 @@ import { saveToken } from '../utils/token';
                         </View>
         
                         <View style={styles.form}>
-                            <View style={styles.input}>
+                            <View style={userNameIsFocused?styles.inputFocused :styles.input}>
         
                                 <TextInput
                                 style={styles.inputControl}
                                 placeholder="Enter Your userName Address"
                                 placeholderTextColor='#6b7280'
                                 value={userName}
+                                onFocus={() => setUserNameIsFocused(true)}
+                                onBlur={() => setUserNameIsFocused(false)}
                                 onChangeText={userName => setUserName(userName)}
                                 />
                             </View>
         
-                            <View style={styles.input}>
+                            <View style={emailIsFocused?styles.inputFocused :styles.input}>
         
                                 <TextInput
                                 autoCapitalize="none"
@@ -72,7 +76,8 @@ import { saveToken } from '../utils/token';
                                 placeholder="Password"
                                 placeholderTextColor='#6b7280'
                                 value={password}
-                                
+                                onFocus={() => setEmailIsFocused(true)}
+                                onBlur={() => setEmailIsFocused(false)}
                                 onChangeText={password => setPassword(password)}
                                 />
                             </View>
@@ -121,8 +126,21 @@ import { saveToken } from '../utils/token';
         color:'black',
         textAlign:'center',
     },
-    input:{
-        marginBottom:15,
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 4,
+        backgroundColor: '#fff',
+        marginBottom: 16,
+    },
+    inputFocused: {
+        borderWidth: 1,
+        borderColor: '#105844',
+        borderRadius: 8,
+        padding: 4,
+        backgroundColor: '#fff',
+        marginBottom: 16,
     },
     inputLabel:{
         fontSize:15,

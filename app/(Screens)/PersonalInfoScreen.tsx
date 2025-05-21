@@ -104,7 +104,7 @@
     const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F7FB',
+        backgroundColor: '#ecfdf5',
     },
     keyboardAvoidingView: {
         flex: 1,
@@ -127,7 +127,7 @@
     label: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#000000',
+        color: '#105844',
         marginBottom: 8,
     },
     input: {
@@ -136,7 +136,7 @@
         padding: 15,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: '#105844',
         color: '#000000',
     },
     center: {

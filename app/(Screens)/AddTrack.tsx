@@ -92,8 +92,6 @@
                 <TouchableOpacity onPress={() => setScanned(false)} >
                     <View
                         style={{
-                            borderTopColor:'#dde3fe',
-                            borderTopWidth:1,
                             padding:20,
                             paddingBottom:20 + bottom ,
                         }}>
@@ -132,10 +130,10 @@
         textAlign: 'center',
     },
     btn: {
-        backgroundColor:'#075eec',
+        backgroundColor:'#ecfdf5',
         borderRadius:8,
         borderWidth:1,
-        borderColor:'#075eec',
+        borderColor:'#105844',
         flexDirection:'row',
         alignItems:'center',
         justifyContent: 'center',
@@ -145,6 +143,6 @@
     btnText:{
         fontSize:18,
         fontWeight:'600',
-        color:'#fff'
+        color:'#105844'
     },
     });
